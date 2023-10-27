@@ -1,12 +1,11 @@
-import { IPhoto } from './IPhoto';
+import { IPhoto } from '@/types/dtos/IPhoto';
 
 export interface IClientCreate {
 	avatar: string;
-	user: {
-		firstName: string;
-		lastName: string;
-		email: string;
-		password: string;
-		photos: IPhoto[];
-	};
+	role: string;
+	firstName: string;
+	lastName: string;
+	email: string;
+	password: string;
+	photos: IPhoto[];
 }

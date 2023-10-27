@@ -1,7 +1,9 @@
 import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 
 export class RegisterRequest {
-	avatar!: string;
+	@IsString()
+		avatar!: string;
+
 	@IsNotEmpty()
 	@IsString()
 		firstName!: string;

@@ -12,35 +12,33 @@ export class LoginService {
 
 	public async login(data: LoginRequest) {
 		const client = await ClientRepository.findOne({
-			where: { user: {
+			where: {
 				isActive: true,
 				email: data.email,
-			}},
-			relations: ['user'],
+			},
 		});
 
 		if (!client) {
 			throw new InvalidCredentialsException();
 		}
 
-		const { user } = client;
-
-		if (!(await this.hashService.compare(data.password, client.user.password))) {
+		if (!(await this.hashService.compare(data.password, client.password))) {
 			throw new InvalidCredentialsException();
 		}
 
+		const { email, role, firstName, lastName, avatar } = client;
 		const { access_token } = this.authService.sign(
 			{
-				userId: user.id,
-				email: user.email,
-				role: user.role
+				userId: client.id,
+				email,
+				role
 			}) as AuthResult;
 
 		return {
-			id: user.id,
-			email: user.email,
-			fullName: user.firstName + ' ' + user.lastName,
-			avatar: client.avatar,
+			id: client.id,
+			email,
+			fullName: firstName + ' ' + lastName,
+			avatar: avatar,
 			accessToken: access_token,
 		}
 	}

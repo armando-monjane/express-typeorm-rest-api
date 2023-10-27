@@ -1,6 +1,5 @@
 import { appConfig } from '@/config/app';
 import { authConfig } from '@/config/auth';
-import { Server } from 'http';
 
 import { useContainer as routingControllersUseContainer, useExpressServer, getMetadataArgsStorage } from 'routing-controllers';
 import { Container } from 'typedi';
@@ -15,27 +14,22 @@ import { routingControllersToSpec } from 'routing-controllers-openapi';
 import swaggerUiExpress from 'swagger-ui-express';
 
 import { AppDataSource } from '@/data-source';
+import path from 'path';
 
 export class App {
-	private app: express.Application = express();
-	private port = appConfig.port || 3000;
-	private server!: Server;
-
-	public constructor() {
-		void this.bootstrap();
-	}
+	public app: express.Application = express();
 
 	public async bootstrap(): Promise<void> {
 		try {
-			this.useContainers();
 			await this.typeOrmCreateConnection();
+			this.useContainers();
 			this.setupMiddlewares();
+			this.serveStaticFiles();
 			this.registerControllers();
 			this.setupSwagger();
 			this.register404Route();
-			this.configureServer();
 		} catch (error) {
-			console.log('Error during bootstrap:', error);
+			console.error('Error during bootstrap:', error);
 			process.exit(1);
 		}
 	}
@@ -46,9 +40,22 @@ export class App {
 
 	private async typeOrmCreateConnection() {
 		try {
-			await AppDataSource.initialize();
-		} catch (error) {
-			console.log(' Cannot connect to database: ', error);
+			if (!appConfig.isProduction) {
+				console.log('Connecting Database...');
+			}
+
+			await AppDataSource.initialize()
+				.then(() => {
+					if (!appConfig.isProduction) {
+						console.log('Database connection established');
+					}
+				})
+				.catch((err) => {
+					console.error('Error connecting Database:', err);
+					// process.exit(1);
+				});
+		} catch (err) {
+			console.error('Error connecting Database', err)
 		}
 	}
 
@@ -96,46 +103,10 @@ export class App {
 		});
 	}
 
-	exitHandler(): void {
-		this.server.close(() => {
-			console.log('Server closed');
-			//  TODO: add logger
-			// logger.info('Server closed');
-			process.exit(1);
-		});
-	};
-
-	unexpectedErrorHandler(error: Error): void {
-		console.error(error);
-		// logger.error(error);
-		this.exitHandler();
-	};
-
-	private configureServer() {
-		this.server = this.app.listen(this.port, (): void => {
-			console.log(`Environment: ${process.env.NODE_ENV} Application listening on PORT: ${this.port}`);
-			// logger.info(`Environment: ${process.env.NODE_ENV} Application listening on PORT: ${this.port}`);
-		});
-
-		process.on('uncaughtException', (err) => this.unexpectedErrorHandler(err));
-		process.on('unhandledRejection', (reason: Error) => {
-			throw reason;
-		});
-
-		process.on('SIGTERM', () => {
-			console.log('SIGTERM received');
-			//   logger.info('SIGTERM received');
-			if (this.server) {
-				this.server.close();
-			}
-		});
-	}
 
 	private setupSwagger() {
 		// Parse class-validator classes into JSON Schema
-
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-		const schemas = validationMetadatasToSchemas() as { [key: string]: object; };
+		const schemas = validationMetadatasToSchemas() as { [key: string]: any; };
 
 		// Parse routing-controllers classes into OpenAPI spec:
 		const storage = getMetadataArgsStorage();
@@ -154,9 +125,9 @@ export class App {
 					},
 				},
 				info: {
-					description: 'Welcome to the club!',
+					description: 'Express REST API',
 					title: 'API Documentation',
-					version: '1.0.0'
+					version: '0.0.1'
 				},
 			},
 		);
@@ -165,6 +136,10 @@ export class App {
 		const { serve } = swaggerUiExpress;
 		this.app.use('/docs', serve, swaggerUiExpress.setup(spec));
 	}
+
+	private serveStaticFiles() {
+		this.app.use('/public', express.static(path.join(appConfig.uploadDirectory), { maxAge: 31557600000 }));
+	}
 }
 
-new App();
+export default new App();

@@ -1,16 +1,25 @@
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
+import { env } from '@/utils/env';
+
+type TypeOrmDatabaseType = 'postgres' | 'mysql' | 'mariadb' | 'mssql'; // add more database types as needed
+
+const getDatabaseType = (): TypeOrmDatabaseType => {
+	return env('DB_TYPE') as TypeOrmDatabaseType || 'postgres';
+};
 
 export const AppDataSource = new DataSource({
-	type: 'postgres',
-	host: 'localhost',
-	port: 5432,
-	username: 'postgres',
-	password: 'secret',
-	database: 'postgres',
+	type: getDatabaseType(),
+	host: env('DB_HOST', 'localhost'),
+	port: Number(env('DB_PORT', '5432')),
+	username: env('DB_USERNAME', 'postgres'),
+	password: env('DB_PASSWORD', 'secret'),
+	database: env('DB_NAME', 'postgres'),
+	dropSchema: env('TYPEORM_DROP_SCHEMA', 'false') === 'true',
+	migrationsRun: env('TYPEORM_MIGRATIONS_RUN', 'false') === 'true',
 	synchronize: false,
-	logging: false,
-	entities: ['src/entities/**/*.ts'],
-	migrations: ['src/migrations/**/*.ts'],
+	logging: env('TYPEORM_LOGGING', 'false') === 'true',
+	entities: [env('TYPEORM_ENTITIES', 'src/entities/**/*.ts')],
+	migrations: [env('TYPEORM_MIGRATIONS', 'src/migrations/**/*.ts')],
 	subscribers: []
 })

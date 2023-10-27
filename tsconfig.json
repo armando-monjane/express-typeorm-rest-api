@@ -1,6 +1,10 @@
 {
    "compilerOptions": {
-      "target": "es6",
+      /* Visit https://aka.ms/tsconfig to read more about this file */
+      "target": "es2017",
+      "module": "commonjs",
+      "outDir": "./dist",
+      "alwaysStrict": true,
       "esModuleInterop": true,
       "noImplicitAny": true,
       "strict": true,
@@ -13,27 +17,34 @@
       "noImplicitReturns": true,
       "types": [
          "node",
+         "jest"
       ],
-      "module": "commonjs",
       "moduleResolution": "node",
-      "baseUrl": "./src",
-      "outDir": "./dist",
       "paths": {
-         "@app": ["./app.ts"],
-         "@/*": ["./*"]
+         "@app": [
+            "./src/app.ts"
+         ],
+         "@/*": [
+            "./src/*"
+         ],
+         "@test/*": [
+            "./__test__/*",
+         ]
       },
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
-      "sourceMap": true
+      "sourceMap": true,
+      "plugins": [
+         // Transform paths in output .js files
+         {
+            "transform": "typescript-transform-paths",
+         },
+         // Transform paths in output .d.ts files (Include this line if you output declarations files)
+         {
+            "transform": "typescript-transform-paths",
+            "afterDeclarations": true
+         }
+      ]
    },
-   "exclude": [
-      "dist",
-      "node_modules",
-      "test/**/*",
-      "ci/**/*",
-      "scripts/**/*",
-      "**/__mocks__/**/*",
-      "**/node_modules/**/*",
-      "**/*.(spec|test).ts"
-   ],
+   "exclude": ["./coverage", "./dist", "jest.config.js"]
 }

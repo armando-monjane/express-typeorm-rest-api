@@ -8,6 +8,8 @@ node_modules
 .eslintrc
 .editorconfig
 jest.config.js
-.env.example
 **/uploads/**
-db-data/
+db-data
+db-test-data
+.env
+**.DS_Store

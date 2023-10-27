@@ -1,18 +1,19 @@
-FROM node:21.0-alpine AS development
+FROM node:18-slim as build-stage
 
-# Create app directory
 WORKDIR /app
 
-COPY package.json .
-COPY package-lock.json .
+COPY package*.json /app
 
-RUN npm ci
+RUN npm install
 
-COPY .env.example .env
-COPY . .
+# Test build stage
+FROM build-stage as test-stage
+
+CMD ["npm", "run", "test"]
+
+# Build dev stage
+FROM build-stage as dev-stage
 
 EXPOSE 3000
 
-ENV NODE_ENV production
-
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]

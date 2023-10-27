@@ -1,9 +1,6 @@
-import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Entity } from 'typeorm'
+import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm'
 import { UserRole } from '@/entities/UserRole'
-import { Photo } from '@/entities/Photo'
-
-@Entity()
-export class User {
+export abstract class User {
 
     @PrimaryGeneratedColumn()
     	id!: number
@@ -56,7 +53,4 @@ export class User {
     	name: 'updated_at',
     })
     	updatedAt!: Date
-
-    @OneToMany(() => Photo, photo => photo.user, { cascade: true })
-    	photos!: Photo[]
 }

@@ -17,6 +17,7 @@ export const appConfig = {
 	routePrefix: env('APP_ROUTE_PREFIX'),
 	url: env('APP_URL'),
 	appPath: getAppPath(),
+	uploadDirectory: env('UPLOAD_DIRECTORY'),
 	entitiesDir: env('TYPEORM_ENTITIES_DIR'),
 	controllersDir: env('CONTROLLERS_DIR'),
 	middlewaresDir: env('MIDDLEWARES_DIR'),
