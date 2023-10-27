@@ -1,0 +1,13 @@
+.git
+.gitignore
+.dockerignore
+Dockerfile
+node_modules
+.vscode
+.idea
+.eslintrc
+.editorconfig
+jest.config.js
+.env.example
+**/uploads/**
+db-data/

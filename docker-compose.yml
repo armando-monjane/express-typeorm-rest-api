@@ -1,0 +1,41 @@
+version: '3'
+services:
+  # backend:
+  #   restart: always
+  #   container_name: backend
+  #   build: .
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - pg
+  #   networks:
+  #     - express-pg
+
+  pg:
+    image: postgres
+    container_name: pg-server
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: secret
+    networks:
+      - express-pg
+
+  admin:
+    image: adminer
+    restart: always
+    depends_on: 
+      - pg
+    ports:
+      - 8080:8080
+    networks:
+      - express-pg
+
+networks:
+  express-pg:
+
+volumes:
+  db-data:

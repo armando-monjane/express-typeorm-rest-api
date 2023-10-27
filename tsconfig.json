@@ -1,0 +1,39 @@
+{
+   "compilerOptions": {
+      "target": "es6",
+      "esModuleInterop": true,
+      "noImplicitAny": true,
+      "strict": true,
+      "forceConsistentCasingInFileNames": true,
+      "strictNullChecks": true,
+      "strictFunctionTypes": true,
+      "strictBindCallApply": true,
+      "strictPropertyInitialization": true,
+      "noUnusedParameters": true,
+      "noImplicitReturns": true,
+      "types": [
+         "node",
+      ],
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "baseUrl": "./src",
+      "outDir": "./dist",
+      "paths": {
+         "@app": ["./app.ts"],
+         "@/*": ["./*"]
+      },
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "sourceMap": true
+   },
+   "exclude": [
+      "dist",
+      "node_modules",
+      "test/**/*",
+      "ci/**/*",
+      "scripts/**/*",
+      "**/__mocks__/**/*",
+      "**/node_modules/**/*",
+      "**/*.(spec|test).ts"
+   ],
+}
