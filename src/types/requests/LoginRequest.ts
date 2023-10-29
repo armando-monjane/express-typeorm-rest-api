@@ -1,11 +1,18 @@
 import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
 
 export class LoginRequest {
-	@IsNotEmpty()
-	@IsEmail()
+	
+	@IsEmail({}, {
+		message: 'please provide a valid email!'
+	})
+	@IsNotEmpty({
+		message: 'email is required'
+	})
 		email!: string;
 
-	@IsNotEmpty()
 	@IsString()
+	@IsNotEmpty({
+		message: 'password is required!'
+	})
 		password!: string;
 }

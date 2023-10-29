@@ -4,19 +4,25 @@ export class RegisterRequest {
 	@IsString()
 		avatar!: string;
 
-	@IsNotEmpty()
 	@IsString()
+	@IsNotEmpty()
 		firstName!: string;
 
-	@IsNotEmpty()
 	@IsString()
+	@IsNotEmpty()
 		lastName!: string;
 
-	@IsNotEmpty()
-	@IsEmail()
+	@IsEmail({}, {
+		message: 'please provide a valid email!'
+	})
+	@IsNotEmpty({
+		message: 'email is required!'
+	})
 		email!: string;
 
-	@IsNotEmpty()
 	@IsString()
+	@IsNotEmpty({
+		message: 'password is required!'
+	})
 		password!: string;
 }
