@@ -15,13 +15,28 @@ import { IFile } from '@/types/dtos/IFile';
 import { IPhoto } from '@/types/dtos/IPhoto';
 import { BadRequestError } from 'routing-controllers';
 import { UserRole } from '@/entities/UserRole';
+import { ILoggedUser } from '@/types/dtos/ILoggedUser';
 
 @Service()
 export class RegisterService {
-	constructor(private authService: AuthService, private hashService: HashService) { }
+	/**
+	 * Service responsible for handling client register.
+	 * @param {AuthService} authService - An instance of the authentication service.
+	 * @param {HashService} hashService - An instance of the hash service.
+	 */
+	constructor(
+		private authService: AuthService,
+		private hashService: HashService
+	) {}
 
-	async register(request: RegisterRequest, files: IFile[]) {
-
+	/**
+	 * Registers a new client with the given information and files.
+	 * @param request - The request containing the client information.
+	 * @param files - The files to be uploaded for the client.
+	 * @returns An object containing the registered client's information and access token.
+	 * @throws An error if an account with the given email already exists, or if the files are invalid.
+	 */
+	async register(request: RegisterRequest, files: IFile[]): Promise<ILoggedUser> {
 		const userByEmail = await ClientRepository.findByEmail(request.email);
 		if (userByEmail) {
 			throw new Error(`Account with email ${request.email} already exists! Please login instead.`);
@@ -35,29 +50,28 @@ export class RegisterService {
 			password: await this.hashService.make(request.password),
 			photos: [],
 			avatar: request.avatar || 'https://www.gravatar.com/avatar',
-		}
+		};
 
-		return await ClientRepository.manager.transaction(async transactionalEntityManager => {
+		return await ClientRepository.manager.transaction(async (transactionalEntityManager) => {
 			const photos = this.generatePhotos(files);
 			client.photos = photos;
 
 			// TODO: fix client type to avoid this cast
-			const clientToBeCreated = transactionalEntityManager.create<Client>(Client, ((client as unknown) as Client));
+			const clientToBeCreated = transactionalEntityManager.create<Client>(Client, client as unknown as Client);
 			const registeredClient = await transactionalEntityManager.save<Client>(clientToBeCreated);
 
 			await this.uploadFiles(photos);
 
 			const { email, role, firstName, lastName, avatar } = registeredClient;
 
-			const { access_token } = this.authService.sign(
-				{
-					userId: registeredClient.id,
-					email,
-					role,
-				}) as AuthResult;
+			const { access_token } = this.authService.sign({
+				userId: registeredClient.id,
+				email,
+				role,
+			}) as AuthResult;
 
 			return {
-				id: registeredClient.id,
+				userId: registeredClient.id,
 				email,
 				fullName: firstName + ' ' + lastName,
 				avatar,
@@ -66,12 +80,17 @@ export class RegisterService {
 		});
 	}
 
+	/**
+	 * Validates the given files to ensure they meet the requirements.
+	 * @param files - The files to be validated.
+	 * @throws A BadRequestError if the files are invalid.
+	 */
 	private validatesFiles(files: IFile[]) {
 		if (!files || files.length < 4) {
 			throw new BadRequestError('Please upload at least 4 images.');
 		}
 
-		if (files.some(file => !file.mimetype.startsWith('image'))) {
+		if (files.some((file) => !file.mimetype.startsWith('image'))) {
 			throw new BadRequestError('Please upload only images.');
 		}
 
@@ -81,6 +100,11 @@ export class RegisterService {
 		}
 	}
 
+	/**
+	 * Uploads the given photos to the server.
+	 * @param photos - The photos to be uploaded.
+	 * @returns A Promise that resolves when all photos have been uploaded.
+	 */
 	private async uploadFiles(photos: IPhoto[]): Promise<void> {
 		const uploadDir = path.join(appConfig.uploadDirectory);
 
@@ -98,15 +122,22 @@ export class RegisterService {
 				writeStream.on('finish', () => {
 					resolve();
 				});
-				writeStream.on('error', (error) => { reject(error); });
+				writeStream.on('error', (error) => {
+					reject(error);
+				});
 				writeStream.write(photo.buffer);
 				writeStream.end();
 			});
 		}
 	}
 
+	/**
+	 * Generates an array of photos from the given files.
+	 * @param files - The files to be converted to photos.
+	 * @returns An array of photos.
+	 */
 	private generatePhotos(files: IFile[]): IPhoto[] {
-		return files.map(file => ({
+		return files.map((file) => ({
 			url: `${Date.now()}-${file.originalname}`,
 			name: file.originalname,
 			buffer: file.buffer,

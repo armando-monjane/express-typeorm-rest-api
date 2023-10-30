@@ -2,6 +2,9 @@ import bcrypt from 'bcrypt';
 import { hashingConfig } from '@/config/hashing';
 import { IHashProvider } from '@/services/hash/providers/IHashProvider';
 
+/**
+ * Provides hash functions using the bcrypt
+ */
 export class BcryptProvider implements IHashProvider {
 	private bcrypt = bcrypt;
 	private defaultRounds = hashingConfig.disks.bcrypt.defaultRounds;

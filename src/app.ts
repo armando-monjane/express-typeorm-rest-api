@@ -69,7 +69,7 @@ export class App {
 		// parse urlencoded request body
 		this.app.use(express.urlencoded({ extended: true }));
 
-		// Passport
+		// Passport to handle jwt authentication
 		const options: StrategyOptions = {
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 			secretOrKey: authConfig.providers.jwt.secret,
