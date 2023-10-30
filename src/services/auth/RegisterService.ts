@@ -16,6 +16,7 @@ import { IPhoto } from '@/types/dtos/IPhoto';
 import { BadRequestError } from 'routing-controllers';
 import { UserRole } from '@/entities/UserRole';
 import { ILoggedUser } from '@/types/dtos/ILoggedUser';
+import { ConflictException } from '@/exceptions/conflict/ConflictException';
 
 @Service()
 export class RegisterService {
@@ -34,12 +35,13 @@ export class RegisterService {
 	 * @param request - The request containing the client information.
 	 * @param files - The files to be uploaded for the client.
 	 * @returns An object containing the registered client's information and access token.
-	 * @throws An error if an account with the given email already exists, or if the files are invalid.
+	 * @throws {BadRequestError} if the given request body is invalid.
+	 * @throws {ConflictException} if an account with the given email already exists.
 	 */
 	async register(request: RegisterRequest, files: IFile[]): Promise<ILoggedUser> {
 		const userByEmail = await ClientRepository.findByEmail(request.email);
 		if (userByEmail) {
-			throw new Error(`Account with email ${request.email} already exists! Please login instead.`);
+			throw new ConflictException(`Account with email ${request.email} already exists! Please login instead.`);
 		}
 
 		this.validatesFiles(files);
