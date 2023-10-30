@@ -8,7 +8,12 @@ const getDatabaseType = (): TypeOrmDatabaseType => {
 	return env('DB_TYPE') as TypeOrmDatabaseType || 'postgres';
 };
 
-export const AppDataSource = new DataSource({
+
+/**
+ * The data source for the application.
+ * @type {DataSource}
+ */
+export const AppDataSource: DataSource = new DataSource({
 	type: getDatabaseType(),
 	host: env('DB_HOST', 'localhost'),
 	port: Number(env('DB_PORT', '5432')),
