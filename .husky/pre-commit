@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-if npm run lint && make test;
+if make lint && make test;
 then
     exit 0
 else
