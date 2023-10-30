@@ -10,7 +10,6 @@ coverage/
 
 # containers
 db-data/
-db-test-data/
 
 #  system files
 **.DS_Store
