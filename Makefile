@@ -28,7 +28,7 @@ up-admin:
 	@echo "Starting adminer..."
 	@docker-compose up -d ${ADMINER_CONTAINER_NAME} adminer
 
-db-migrate:
+db-migrate: up-db
 	@echo "Migrating database..."
 	@docker-compose ${DOCKER_COMPOSE_ARGS} run --rm ${BACKEND_CONTAINER_NAME} npm run migrate
 
