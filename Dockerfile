@@ -1,10 +1,12 @@
 FROM node:18-slim as build-stage
 
-WORKDIR /app
+USER ${USER_NAME}
 
-COPY package*.json /app
+COPY --chown=app:app package*.json ./
 
 RUN npm install
+
+COPY --chown=app:app . ./
 
 # Test build stage
 FROM build-stage as test-stage

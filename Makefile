@@ -4,10 +4,6 @@ DB_CONTAINER_NAME=pg-server
 ADMINER_CONTAINER_NAME=adminer
 DOCKER_COMPOSE_ARGS=
 
-migrate:
-	@echo "Migrating database..."
-	@docker-compose exec ${BACKEND_CONTAINER_NAME} npm run migrate
-
 up:
 	@echo "Starting containers..."
 	@docker-compose up ${BACKEND_CONTAINER_NAME}
@@ -39,3 +35,7 @@ db-migrate:
 test:
 	@echo "Running tests..."
 	@docker-compose ${DOCKER_COMPOSE_ARGS} run --rm -T ${TEST_BACKEND_CONTAINER_NAME}
+
+lint:
+	@echo "Running linter..."
+	@docker-compose ${DOCKER_COMPOSE_ARGS} run --rm ${BACKEND_CONTAINER_NAME} npm run lint
