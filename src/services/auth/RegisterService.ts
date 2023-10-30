@@ -68,7 +68,7 @@ export class RegisterService {
 
 	private validatesFiles(files: IFile[]) {
 		if (!files || files.length < 4) {
-			throw new Error('Please upload at least 4 images.');
+			throw new BadRequestError('Please upload at least 4 images.');
 		}
 
 		if (files.some(file => !file.mimetype.startsWith('image'))) {
