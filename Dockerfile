@@ -2,6 +2,8 @@ FROM node:18-slim as build-stage
 
 USER ${USER_NAME}
 
+WORKDIR /app
+
 COPY --chown=app:app package*.json ./
 
 RUN npm install
