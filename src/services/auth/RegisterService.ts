@@ -34,10 +34,10 @@ export class RegisterService {
 			role: UserRole.CLIENT,
 			password: await this.hashService.make(request.password),
 			photos: [],
+			avatar: request.avatar || 'https://www.gravatar.com/avatar',
 		}
 
 		return await ClientRepository.manager.transaction(async transactionalEntityManager => {
-			client.avatar = client.avatar || 'https://www.gravatar.com/avatar';
 			const photos = this.generatePhotos(files);
 			client.photos = photos;
 
