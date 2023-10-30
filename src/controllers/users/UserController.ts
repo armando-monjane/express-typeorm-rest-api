@@ -36,7 +36,7 @@ export class UserController {
 
 		return {
 			...clients,
-			currentPage: queryParams.page || 1,
+			currentPage: Number(queryParams.page) || 1,
 			pageSize: params.take,
 		};
 	}
