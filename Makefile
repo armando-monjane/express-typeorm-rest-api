@@ -38,4 +38,4 @@ test:
 
 lint:
 	@echo "Running linter..."
-	@docker-compose ${DOCKER_COMPOSE_ARGS} run --rm ${BACKEND_CONTAINER_NAME} npm run lint
+	@docker-compose ${DOCKER_COMPOSE_ARGS} run --rm -T ${BACKEND_CONTAINER_NAME} npm run lint
